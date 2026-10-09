@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1f3a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ارشیا TV" />
+  <title>ارشیا TV | پخش زنده و گالری</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="install-banner" class="install-banner" hidden>
+    <div class="install-text">
+      <strong>نصب ارشیا TV</strong>
+      <span>روی صفحه اصلی گوشی</span>
+    </div>
+    <button type="button" class="install-btn" id="install-btn">نصب</button>
+    <button type="button" class="install-close" id="install-close">×</button>
+  </div>
+
+  <nav class="bottom-nav" id="bottom-nav">
+    <button type="button" class="nav-item active" data-view="gallery" onclick="showView('gallery')">
+      <span class="nav-icon">🎬</span><span>گالری</span>
+    </button>
+    <button type="button" class="nav-item" data-view="tv" onclick="showView('tv')">
+      <span class="nav-icon">📺</span><span>پخش زنده</span>
+    </button>
+    <button type="button" class="nav-item" data-view="search" onclick="showView('search')">
+      <span class="nav-icon">🔍</span><span>جستجو</span>
+    </button>
+    <button type="button" class="nav-item" data-view="more" onclick="showView('more')">
+      <span class="nav-icon">✦</span><span>بیشتر</span>
+    </button>
+  </nav>
+
+  <section id="view-gallery" class="view active">
+    <header class="hero-header">
+      <div class="hero-top">
+        <div>
+          <p class="hero-kicker">ARSHIA LIVE</p>
+          <h1 class="app-title">ارشیا <span class="brand-tv">TV</span></h1>
+        </div>
+        <button type="button" class="icon-btn" onclick="showView('more')" title="نصب">↓</button>
+      </div>
+      <div class="search-box">
+        <input type="search" id="search-input" placeholder="جستجوی فیلم..." autocomplete="off" />
+      </div>
+      <div class="category-tabs" id="tabs-bar">
+        <button type="button" class="tab active" data-cat="all" onclick="switchCategory('all')">همه</button>
+        <button type="button" class="tab" data-cat="popular" onclick="switchCategory('popular')">پربازدید</button>
+        <button type="button" class="tab" data-cat="latest" onclick="switchCategory('latest')">جدید</button>
+      </div>
+    </header>
+    <main class="gallery-container">
+      <h2 class="section-title">پیشنهادی</h2>
+      <div class="movie-slider-horizontal" id="horizontal-gallery"></div>
+      <h2 class="section-title">آرشیو</h2>
+      <div class="movie-grid-vertical" id="vertical-gallery"></div>
+      <p class="empty-hint" id="gallery-empty">هنوز فیلمی ثبت نشده. از ربات اضافه کنید.</p>
+    </main>
+  </section>
+
+  <section id="view-tv" class="view">
+    <header class="hero-header compact">
+      <div class="hero-top">
+        <div>
+          <p class="hero-kicker">LIVE STREAM</p>
+          <h1 class="app-title">پخش زنده</h1>
+        </div>
+        <div class="tv-model-picker" id="tv-model-picker">
+          <button type="button" class="model-btn active" data-model="modern_flat" onclick="setTvModel('modern_flat')">مدرن</button>
+          <button type="button" class="model-btn" data-model="cinema" onclick="setTvModel('cinema')">سینمایی</button>
+          <button type="button" class="model-btn" data-model="neon" onclick="setTvModel('neon')">نئون</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="tv-stage" id="tv-stage">
+      <div class="smart-tv" id="vintage-tv">
+        <div class="smart-tv-bezel">
+          <div class="tv-screen" id="tv-screen">
+            <div class="screen-noise" id="tv-noise"></div>
+            <div class="screen-off-label" id="tv-off-label">آماده پخش<br /><small>شبکه را انتخاب کنید</small></div>
+            <video id="live-player" playsinline webkit-playsinline controls></video>
+            <iframe id="site-frame" class="site-frame" title="site" style="display:none" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+            <div class="wm-logo" aria-hidden="true">ARSHIA TV</div>
+          </div>
+          <div class="smart-tv-led" id="tv-led"></div>
+        </div>
+        <div class="smart-tv-bar">
+          <span class="smart-brand">ARSHIA TV</span>
+          <div class="smart-actions">
+            <button type="button" class="smart-btn" onclick="tuneByIndex(0)">۱</button>
+            <button type="button" class="smart-btn" onclick="tuneByIndex(1)">۲</button>
+            <button type="button" class="smart-btn" onclick="tuneByIndex(2)">۳</button>
+            <button type="button" class="smart-btn" onclick="tuneByIndex(3)">۴</button>
+            <button type="button" class="smart-btn power" id="tv-power" onclick="togglePower()">●</button>
+            <button type="button" class="smart-btn" onclick="toggleFullscreen()">⛶</button>
+          </div>
+        </div>
+      </div>
+      <p class="now-playing" id="now-playing" hidden></p>
+    </div>
+
+    <div class="tv-channel-list">
+      <div class="group-tabs" id="path-tabs"></div>
+      <div class="group-tabs" id="group-tabs"></div>
+      <div class="channel-grid" id="channel-grid"></div>
+      <div id="channel-panel" class="channel-panel"></div>
+    </div>
+  </section>
+
+  <section id="view-search" class="view">
+    <header class="hero-header compact">
+      <h1 class="app-title">جستجو</h1>
+      <div class="search-box">
+        <input type="search" id="search-input-full" placeholder="نام فیلم..." autocomplete="off" />
+      </div>
+    </header>
+    <main class="gallery-container">
+      <div class="movie-grid-vertical" id="search-results"></div>
+    </main>
+  </section>
+
+  <section id="view-more" class="view">
+    <header class="hero-header compact">
+      <h1 class="app-title">بیشتر</h1>
+    </header>
+    <div class="more-cards">
+      <div class="more-card accent-card">
+        <h3>ارشیا TV</h3>
+        <p>پخش زنده · گالری · تجربه شیک روی گوشی</p>
+      </div>
+      <div class="more-card">
+        <h3>نصب روی گوشی</h3>
+        <ol class="install-steps">
+          <li>در کروم منوی ⋮ را باز کنید</li>
+          <li><b>افزودن به صفحه اصلی</b></li>
+          <li>تأیید — آیکون ارشیا TV می‌آید</li>
+        </ol>
+        <button type="button" class="primary-btn" id="install-btn-2">راهنمای نصب</button>
+      </div>
+      <div class="more-card">
+        <h3>ربات تلگرام</h3>
+        <p>دانلود · آپلود · مدیریت فیلم</p>
+        <a class="primary-btn outline" href="https://t.me/Cinemaahd9707_bot" target="_blank" rel="noopener">باز کردن ربات</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="modal" id="movie-modal" hidden>
+    <div class="modal-card">
+      <button type="button" class="modal-close" onclick="closeMovieModal()">×</button>
+      <div class="modal-poster" id="modal-poster"></div>
+      <h2 id="modal-title"></h2>
+      <p id="modal-meta"></p>
+      <p id="modal-desc"></p>
+      <button type="button" class="primary-btn" id="modal-dl-btn">دریافت از ربات</button>
+    </div>
+  </div>
+
+  <script src="channels.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
