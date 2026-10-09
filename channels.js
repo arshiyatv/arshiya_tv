@@ -87,7 +87,7 @@ window.ARSHIA_CHANNELS = {
       {
         title: "موزیک",
         channels: [
-          { id: "radiojavan", name: "رادیو جوان HD", play: "https://radio.sr-api.ir/hls/stream.m3u8", site: "https://wns.live" },.‌
+          { id: "radiojavan", name: "رادیو جوان HD", play: "https://radio.sr-api.ir/hls/stream.m3u8", site: "https://wns.live" },
           { id: "pmc", name: "شبکه پی‌ام‌سی", play: null, site: "https://pmchd.live" },
           { id: "pmcroyale", name: "پی‌ام‌سی رویال", play: null, site: "https://wns.live" }
         ]
