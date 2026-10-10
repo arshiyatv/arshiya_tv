@@ -1,43 +1,49 @@
 /**
- * ARSHIA TV PRO — BRAIN v3.1
+ * ARSHIA TV PRO — BRAIN v3.2 (Enhanced + Robust)
  */
 (function (global) {
   "use strict";
 
   var Brain = {
-    version: "3.1.0-pro",
+    version: "3.2.0-pro",
     brand: "ARSHIA TV",
+    // اگر Cloudflare Worker ساختی، اینجا بگذار:
+    // proxyBase: "https://YOUR-WORKER.workers.dev/?u=",
     proxyBase: "",
     hls: {
       enableWorker: true,
       lowLatencyMode: true,
       backBufferLength: 30,
-      maxBufferLength: 18,
-      maxMaxBufferLength: 36,
-      maxBufferSize: 18 * 1000 * 1000,
-      maxBufferHole: 0.3,
+      maxBufferLength: 20,
+      maxMaxBufferLength: 40,
+      maxBufferSize: 20 * 1000 * 1000,
+      maxBufferHole: 0.4,
       highBufferWatchdogPeriod: 2,
-      nudgeMaxRetry: 5,
-      fragLoadingTimeOut: 8000,
-      manifestLoadingTimeOut: 5000,
-      levelLoadingTimeOut: 5000,
+      nudgeMaxRetry: 8,
+      fragLoadingTimeOut: 10000,
+      manifestLoadingTimeOut: 8000,
+      levelLoadingTimeOut: 8000,
       startLevel: -1,
-      abrEwmaDefaultEstimate: 800000,
-      testBandwidth: true
+      abrEwmaDefaultEstimate: 900000,
+      testBandwidth: true,
+      progressive: true
     },
-    healthTimeoutMs: 4500,
-    maxFailover: 5,
+    healthTimeoutMs: 5500,
+    maxFailover: 6,
     preconnectHosts: [
       "https://radio.sr-api.ir",
       "https://radio2.sr-api.ir",
       "https://ncdn.telewebion.ir",
       "https://cdn.telewebion.ir",
-      "https://cdn.jsdelivr.net"
+      "https://cdnw.telewebion.com",
+      "https://cdn.jsdelivr.net",
+      "https://hls.pmchd.live",
+      "https://rjtvhls.wns.live"
     ],
     playUrl: function (raw) {
       if (!raw) return "";
       if (!this.proxyBase) return raw;
-      if (/sr-api\.ir/i.test(raw)) return raw;
+      if (/sr-api\.ir|pmchd\.live|wns\.live|radio\.sr-api/i.test(raw)) return raw;
       return this.proxyBase + encodeURIComponent(raw);
     },
     sourcesOf: function (channel) {
