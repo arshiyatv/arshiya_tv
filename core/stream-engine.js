@@ -1,5 +1,5 @@
 /**
- * ARSHIA TV PRO — Stream Engine v3.2.1 (Production Grade)
+ * ARSHIA TV FINAL — Stream Engine v4
  */
 (function (global) {
   "use strict";
@@ -12,7 +12,6 @@
     this.onStatus = null;
     this._destroyed = false;
     this._timer = null;
-    this._retryCount = 0;
   }
 
   StreamEngine.prototype._emit = function (type, detail) {
@@ -23,10 +22,7 @@
 
   StreamEngine.prototype.destroy = function () {
     this._destroyed = true;
-    if (this._timer) {
-      clearTimeout(this._timer);
-      this._timer = null;
-    }
+    if (this._timer) { clearTimeout(this._timer); this._timer = null; }
     this._killHls();
     if (this.video) {
       try {
@@ -39,9 +35,7 @@
 
   StreamEngine.prototype._killHls = function () {
     if (this.hls) {
-      try {
-        this.hls.destroy();
-      } catch (e) {}
+      try { this.hls.destroy(); } catch (e) {}
       this.hls = null;
     }
   };
@@ -50,27 +44,22 @@
     this._destroyed = false;
     this.sources = (sources || []).filter(Boolean);
     this.currentIndex = 0;
-    this._retryCount = 0;
-
     if (!this.sources.length) {
       this._emit("error", { message: "منبع پخش ثبت نشده" });
       return;
     }
-
     if (!global.Hls && !(this.video && this.video.canPlayType("application/vnd.apple.mpegurl"))) {
-      this._emit("error", { message: "کتابخانه پخش هنوز لود نشده" });
+      this._emit("error", { message: "کتابخانه پخش هنوز آماده نیست — چند ثانیه بعد دوباره بزنید" });
       return;
     }
-
     this._tryNext();
   };
 
   StreamEngine.prototype._tryNext = function () {
     var self = this;
     if (this._destroyed) return;
-
     var brain = global.ArshiaBrain || {};
-    var max = brain.maxFailover || 7;
+    var max = brain.maxFailover || 6;
 
     if (this.currentIndex >= this.sources.length || this.currentIndex >= max) {
       this._emit("error", { message: "هیچ منبعی پاسخ نداد" });
@@ -79,23 +68,15 @@
 
     var raw = this.sources[this.currentIndex];
     var url = brain.playUrl ? brain.playUrl(raw) : raw;
-
     this._emit("connecting", { index: this.currentIndex, url: raw });
     this._killHls();
-
-    if (this._timer) {
-      clearTimeout(this._timer);
-      this._timer = null;
-    }
+    if (this._timer) { clearTimeout(this._timer); this._timer = null; }
 
     if (global.Hls && Hls.isSupported()) {
       var conf = Object.assign({}, brain.hls || {});
       conf.xhrSetup = function (xhr) {
-        try {
-          xhr.withCredentials = false;
-        } catch (e) {}
+        try { xhr.withCredentials = false; } catch (e) {}
       };
-
       var hls = new Hls(conf);
       this.hls = hls;
       var settled = false;
@@ -103,10 +84,7 @@
       var fail = function (reason) {
         if (settled || self._destroyed) return;
         settled = true;
-        if (self._timer) {
-          clearTimeout(self._timer);
-          self._timer = null;
-        }
+        if (self._timer) { clearTimeout(self._timer); self._timer = null; }
         self._emit("failover", { index: self.currentIndex, reason: reason || "" });
         self.currentIndex += 1;
         self._tryNext();
@@ -115,10 +93,7 @@
       var ok = function () {
         if (settled || self._destroyed) return;
         settled = true;
-        if (self._timer) {
-          clearTimeout(self._timer);
-          self._timer = null;
-        }
+        if (self._timer) { clearTimeout(self._timer); self._timer = null; }
         self._emit("playing", { index: self.currentIndex, url: raw });
       };
 
@@ -131,14 +106,10 @@
           p.then(ok).catch(function () {
             self._emit("need_gesture", {});
             var once = function () {
-              self.video.play().then(ok).catch(function () {
-                fail("play_blocked");
-              });
+              self.video.play().then(ok).catch(function () { fail("play_blocked"); });
               self.video.removeEventListener("click", once);
-              self.video.removeEventListener("touchstart", once);
             };
             self.video.addEventListener("click", once);
-            self.video.addEventListener("touchstart", once);
           });
         } else {
           ok();
@@ -148,15 +119,10 @@
       hls.on(Hls.Events.ERROR, function (ev, data) {
         if (!data || !data.fatal) return;
         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-          try {
-            hls.startLoad();
-          } catch (e) {
-            fail("network");
-            return;
-          }
+          try { hls.startLoad(); } catch (e) { fail("network"); return; }
           self._timer = setTimeout(function () {
             if (!settled) fail("network_timeout");
-          }, brain.healthTimeoutMs || 6000);
+          }, brain.healthTimeoutMs || 5500);
         } else {
           fail(data.type || "fatal");
         }
@@ -164,7 +130,7 @@
 
       this._timer = setTimeout(function () {
         if (!settled && !self._destroyed) fail("timeout");
-      }, (brain.healthTimeoutMs || 6000) + 3000);
+      }, (brain.healthTimeoutMs || 5500) + 2500);
 
     } else if (this.video.canPlayType("application/vnd.apple.mpegurl")) {
       this.video.src = url;
