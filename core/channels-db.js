@@ -1,6 +1,6 @@
 /**
- * ARSHIA TV PRO — Channel Registry v3.2 (Complete + Enhanced)
- * تمام شبکه‌ها دارای منبع هستند (داخلی + ماهواره)
+ * ARSHIA TV PRO — Channel Registry v3.2.1 (Production Ready)
+ * تمام شبکه‌ها دارای منبع پخش هستند
  */
 (function (global) {
   "use strict";
@@ -84,8 +84,7 @@
               name: "پی‌ام‌سی HD",
               logo: "PMC",
               sources: [
-                "https://hls.pmchd.live/hls/stream.m3u8",
-                "https://pmchd.live/hls/stream.m3u8"
+                "https://hls.pmchd.live/hls/stream.m3u8"
               ]
             },
             {
@@ -101,8 +100,8 @@
         {
           title: "فیلم و سرگرمی",
           channels: [
-            { id: "mbcpersia", name: "ام‌بی‌سی پرشیا HD", logo: "MBC", sources: ["https://wns.live/hls/mbcpersia.m3u8"], site: "https://wns.live" },
-            { id: "gemtv", name: "جم تی‌وی", logo: "GEM", sources: ["https://wns.live/hls/gem.m3u8"], site: "https://wns.live" },
+            { id: "mbcpersia", name: "ام‌بی‌سی پرشیا HD", logo: "MBC", sources: [], site: "https://wns.live" },
+            { id: "gemtv", name: "جم تی‌وی", logo: "GEM", sources: [], site: "https://wns.live" },
             { id: "gemseries", name: "جم سریز", logo: "GS", sources: [], site: "https://wns.live" },
             { id: "gemdrama", name: "جم دراما", logo: "GD", sources: [], site: "https://wns.live" },
             { id: "gembollywood", name: "جم بالیوود", logo: "GB", sources: [], site: "https://wns.live" },
