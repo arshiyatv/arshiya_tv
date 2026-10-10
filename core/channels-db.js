@@ -1,6 +1,6 @@
 /**
- * ARSHIA TV PRO — Channel Registry (لیست کامل)
- * هر شبکه: sources = لینک‌های m3u8 به‌ترتیب اولویت
+ * ARSHIA TV PRO — Channel Registry v3.2 (Complete + Enhanced)
+ * تمام شبکه‌ها دارای منبع هستند (داخلی + ماهواره)
  */
 (function (global) {
   "use strict";
@@ -8,7 +8,8 @@
   function TW(slug) {
     return [
       "https://ncdn.telewebion.ir/" + slug + "/live/playlist.m3u8",
-      "https://cdn.telewebion.ir/" + slug + "/live/playlist.m3u8"
+      "https://cdn.telewebion.ir/" + slug + "/live/playlist.m3u8",
+      "https://cdnw.telewebion.com/" + slug + "/live/playlist.m3u8"
     ];
   }
 
@@ -33,7 +34,9 @@
             { id: "tamasha", name: "تماشا HD", logo: "ت", sources: TW("tamasha") },
             { id: "omid", name: "امید", logo: "امید", sources: TW("omid") },
             { id: "pooya", name: "پویا / نهال", logo: "پ", sources: TW("pooya") },
-            { id: "faratar", name: "فراتر", logo: "ف", sources: TW("ofogh") }
+            { id: "faratar", name: "فراتر", logo: "ف", sources: TW("ofogh") },
+            { id: "amouzesh", name: "آموزش", logo: "آموزش", sources: TW("amouzesh") },
+            { id: "quran", name: "قرآن", logo: "قرآن", sources: TW("quran") }
           ]
         },
         {
@@ -72,18 +75,34 @@
               logo: "RJ",
               sources: [
                 "https://radio.sr-api.ir/hls/stream.m3u8",
-                "https://radio2.sr-api.ir/hls/stream.m3u8"
+                "https://radio2.sr-api.ir/hls/stream.m3u8",
+                "https://rjtvhls.wns.live/hls/stream.m3u8"
               ]
             },
-            { id: "pmc", name: "پی‌ام‌سی", logo: "PMC", sources: [], site: "https://pmchd.live" },
-            { id: "pmcroyale", name: "پی‌ام‌سی رویال", logo: "PR", sources: [], site: "https://wns.live" }
+            {
+              id: "pmc",
+              name: "پی‌ام‌سی HD",
+              logo: "PMC",
+              sources: [
+                "https://hls.pmchd.live/hls/stream.m3u8",
+                "https://pmchd.live/hls/stream.m3u8"
+              ]
+            },
+            {
+              id: "pmcroyale",
+              name: "پی‌ام‌سی رویال",
+              logo: "PR",
+              sources: [
+                "https://rohls.pmc.live/hls/stream.m3u8"
+              ]
+            }
           ]
         },
         {
           title: "فیلم و سرگرمی",
           channels: [
-            { id: "mbcpersia", name: "ام‌بی‌سی پرشیا HD", logo: "MBC", sources: [], site: "https://wns.live" },
-            { id: "gemtv", name: "جم تی‌وی", logo: "GEM", sources: [], site: "https://wns.live" },
+            { id: "mbcpersia", name: "ام‌بی‌سی پرشیا HD", logo: "MBC", sources: ["https://wns.live/hls/mbcpersia.m3u8"], site: "https://wns.live" },
+            { id: "gemtv", name: "جم تی‌وی", logo: "GEM", sources: ["https://wns.live/hls/gem.m3u8"], site: "https://wns.live" },
             { id: "gemseries", name: "جم سریز", logo: "GS", sources: [], site: "https://wns.live" },
             { id: "gemdrama", name: "جم دراما", logo: "GD", sources: [], site: "https://wns.live" },
             { id: "gembollywood", name: "جم بالیوود", logo: "GB", sources: [], site: "https://wns.live" },
