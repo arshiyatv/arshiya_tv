@@ -1,49 +1,37 @@
-var CACHE = "arshia-tv-pro-v31";
-var SHELL = [
+const CACHE_NAME = "arshia-tv-v3.2.1";
+const ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./manifest.json",
+  "./icon-192.png",
+  "./icon-512.png",
   "./core/brain.js",
   "./core/channels-db.js",
-  "./core/stream-engine.js",
-  "./manifest.json",
-  "./assets/icon-192.png",
-  "./assets/icon-512.png"
+  "./core/stream-engine.js"
 ];
 
-self.addEventListener("install", function (e) {
-  e.waitUntil(
-    caches.open(CACHE).then(function (c) {
-      return Promise.all(SHELL.map(function (u) {
-        return c.add(u).catch(function () {});
-      }));
-    }).then(function () { return self.skipWaiting(); })
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
+  self.skipWaiting();
 });
 
-self.addEventListener("activate", function (e) {
-  e.waitUntil(
-    caches.keys().then(function (keys) {
-      return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) {
-        return caches.delete(k);
-      }));
-    }).then(function () { return self.clients.claim(); })
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    )
   );
+  self.clients.claim();
 });
 
-self.addEventListener("fetch", function (e) {
-  var url = e.request.url;
-  if (/\.m3u8(\?|$)/i.test(url) || /\.ts(\?|$)/i.test(url) || /sr-api\.ir|telewebion\.ir/i.test(url)) {
-    return;
-  }
-  if (e.request.method !== "GET") return;
-  e.respondWith(
-    caches.match(e.request).then(function (hit) {
-      var net = fetch(e.request).then(function (res) {
-        return res;
-      }).catch(function () { return hit; });
-      return hit || net;
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      return cached || fetch(event.request).catch(() => cached);
     })
   );
 });
