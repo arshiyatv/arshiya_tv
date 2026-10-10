@@ -1,6 +1,6 @@
 /**
- * ARSHIA TV PRO — Channel Registry v3.2.1 (Production Ready)
- * تمام شبکه‌ها دارای منبع پخش هستند
+ * ARSHIA TV PRO — Channel Registry (لیست کامل)
+ * هر شبکه: sources = لینک‌های m3u8 به‌ترتیب اولویت
  */
 (function (global) {
   "use strict";
@@ -8,8 +8,7 @@
   function TW(slug) {
     return [
       "https://ncdn.telewebion.ir/" + slug + "/live/playlist.m3u8",
-      "https://cdn.telewebion.ir/" + slug + "/live/playlist.m3u8",
-      "https://cdnw.telewebion.com/" + slug + "/live/playlist.m3u8"
+      "https://cdn.telewebion.ir/" + slug + "/live/playlist.m3u8"
     ];
   }
 
@@ -34,9 +33,7 @@
             { id: "tamasha", name: "تماشا HD", logo: "ت", sources: TW("tamasha") },
             { id: "omid", name: "امید", logo: "امید", sources: TW("omid") },
             { id: "pooya", name: "پویا / نهال", logo: "پ", sources: TW("pooya") },
-            { id: "faratar", name: "فراتر", logo: "ف", sources: TW("ofogh") },
-            { id: "amouzesh", name: "آموزش", logo: "آموزش", sources: TW("amouzesh") },
-            { id: "quran", name: "قرآن", logo: "قرآن", sources: TW("quran") }
+            { id: "faratar", name: "فراتر", logo: "ف", sources: TW("ofogh") }
           ]
         },
         {
@@ -75,26 +72,11 @@
               logo: "RJ",
               sources: [
                 "https://radio.sr-api.ir/hls/stream.m3u8",
-                "https://radio2.sr-api.ir/hls/stream.m3u8",
-                "https://rjtvhls.wns.live/hls/stream.m3u8"
+                "https://radio2.sr-api.ir/hls/stream.m3u8"
               ]
             },
-            {
-              id: "pmc",
-              name: "پی‌ام‌سی HD",
-              logo: "PMC",
-              sources: [
-                "https://hls.pmchd.live/hls/stream.m3u8"
-              ]
-            },
-            {
-              id: "pmcroyale",
-              name: "پی‌ام‌سی رویال",
-              logo: "PR",
-              sources: [
-                "https://rohls.pmc.live/hls/stream.m3u8"
-              ]
-            }
+            { id: "pmc", name: "پی‌ام‌سی", logo: "PMC", sources: [], site: "https://pmchd.live" },
+            { id: "pmcroyale", name: "پی‌ام‌سی رویال", logo: "PR", sources: [], site: "https://wns.live" }
           ]
         },
         {
