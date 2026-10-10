@@ -1,51 +1,58 @@
 /**
- * ARSHIA TV PRO — BRAIN v3.2.1 (Production)
+ * ARSHIA TV FINAL — BRAIN v4.0
+ * بعد از Deploy موفق Worker، فقط proxyBase را پر کن.
  */
 (function (global) {
   "use strict";
 
   var Brain = {
-    version: "3.2.1-pro",
+    version: "4.0.0",
     brand: "ARSHIA TV",
-    // بعد از ساخت Cloudflare Worker این خط را پر کن:
-    // proxyBase: "https://YOUR-NAME.YOUR-SUBDOMAIN.workers.dev/?u=",
+
+    /**
+     * مثال بعد از تست #EXTM3U:
+     * proxyBase: "https://arshia-proxy.XXXX.workers.dev/?u=",
+     * خالی = فقط منابع CORS-باز (مثل رادیو جوان)
+     */
     proxyBase: "https://arshiya-proxy-5cdc.arshiyatv-hd-c4c.workers.dev/?u=",
+
     hls: {
       enableWorker: true,
       lowLatencyMode: true,
       backBufferLength: 30,
-      maxBufferLength: 22,
-      maxMaxBufferLength: 45,
-      maxBufferSize: 25 * 1000 * 1000,
-      maxBufferHole: 0.5,
+      maxBufferLength: 20,
+      maxMaxBufferLength: 40,
+      maxBufferSize: 20 * 1000 * 1000,
+      maxBufferHole: 0.4,
       highBufferWatchdogPeriod: 2,
-      nudgeMaxRetry: 10,
-      fragLoadingTimeOut: 12000,
-      manifestLoadingTimeOut: 10000,
-      levelLoadingTimeOut: 10000,
+      nudgeMaxRetry: 8,
+      fragLoadingTimeOut: 10000,
+      manifestLoadingTimeOut: 8000,
+      levelLoadingTimeOut: 8000,
       startLevel: -1,
-      abrEwmaDefaultEstimate: 1000000,
-      testBandwidth: true,
-      progressive: true
+      abrEwmaDefaultEstimate: 900000,
+      testBandwidth: true
     },
-    healthTimeoutMs: 6000,
-    maxFailover: 7,
+
+    healthTimeoutMs: 5500,
+    maxFailover: 6,
+
     preconnectHosts: [
       "https://radio.sr-api.ir",
       "https://radio2.sr-api.ir",
       "https://ncdn.telewebion.ir",
       "https://cdn.telewebion.ir",
       "https://cdnw.telewebion.com",
-      "https://cdn.jsdelivr.net",
-      "https://hls.pmchd.live",
-      "https://rjtvhls.wns.live"
+      "https://cdn.jsdelivr.net"
     ],
+
     playUrl: function (raw) {
       if (!raw) return "";
       if (!this.proxyBase) return raw;
-      if (/sr-api\.ir|pmchd\.live|wns\.live|radio\.sr-api/i.test(raw)) return raw;
+      if (/sr-api\.ir/i.test(raw)) return raw;
       return this.proxyBase + encodeURIComponent(raw);
     },
+
     sourcesOf: function (channel) {
       if (!channel) return [];
       var list = [];
@@ -58,6 +65,7 @@
       if (channel.play && list.indexOf(channel.play) < 0) list.unshift(channel.play);
       return list;
     },
+
     preconnect: function () {
       (this.preconnectHosts || []).forEach(function (h) {
         try {
@@ -74,5 +82,6 @@
       });
     }
   };
+
   global.ArshiaBrain = Brain;
 })(window);
