@@ -14,7 +14,7 @@
      * proxyBase: "https://arshia-proxy.XXXX.workers.dev/?u=",
      * خالی = فقط منابع CORS-باز (مثل رادیو جوان)
      */
-    proxyBase: "",
+    proxyBase: "https://arshiya-proxy-5cdc.arshiyatv-hd-c4c.workers.dev/?u=",
 
     hls: {
       enableWorker: true,
