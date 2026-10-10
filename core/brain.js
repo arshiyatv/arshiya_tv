@@ -1,35 +1,35 @@
 /**
- * ARSHIA TV PRO — BRAIN v3.2 (Enhanced + Robust)
+ * ARSHIA TV PRO — BRAIN v3.2.1 (Production)
  */
 (function (global) {
   "use strict";
 
   var Brain = {
-    version: "3.2.0-pro",
+    version: "3.2.1-pro",
     brand: "ARSHIA TV",
-    // اگر Cloudflare Worker ساختی، اینجا بگذار:
-    // proxyBase: "https://YOUR-WORKER.workers.dev/?u=",
+    // بعد از ساخت Cloudflare Worker این خط را پر کن:
+    // proxyBase: "https://YOUR-NAME.YOUR-SUBDOMAIN.workers.dev/?u=",
     proxyBase: "",
     hls: {
       enableWorker: true,
       lowLatencyMode: true,
       backBufferLength: 30,
-      maxBufferLength: 20,
-      maxMaxBufferLength: 40,
-      maxBufferSize: 20 * 1000 * 1000,
-      maxBufferHole: 0.4,
+      maxBufferLength: 22,
+      maxMaxBufferLength: 45,
+      maxBufferSize: 25 * 1000 * 1000,
+      maxBufferHole: 0.5,
       highBufferWatchdogPeriod: 2,
-      nudgeMaxRetry: 8,
-      fragLoadingTimeOut: 10000,
-      manifestLoadingTimeOut: 8000,
-      levelLoadingTimeOut: 8000,
+      nudgeMaxRetry: 10,
+      fragLoadingTimeOut: 12000,
+      manifestLoadingTimeOut: 10000,
+      levelLoadingTimeOut: 10000,
       startLevel: -1,
-      abrEwmaDefaultEstimate: 900000,
+      abrEwmaDefaultEstimate: 1000000,
       testBandwidth: true,
       progressive: true
     },
-    healthTimeoutMs: 5500,
-    maxFailover: 6,
+    healthTimeoutMs: 6000,
+    maxFailover: 7,
     preconnectHosts: [
       "https://radio.sr-api.ir",
       "https://radio2.sr-api.ir",
