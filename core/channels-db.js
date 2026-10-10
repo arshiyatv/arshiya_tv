@@ -26,7 +26,7 @@ function TW(slug) {
         {
           title: "سراسری",
           channels: [
-            { id: "tv1_fam", name: "شبکه یک (فام)", logo: "۱", sources: ["https://fam.ir"] },
+            { id: "tv1_official", name: "شبکه یک (سایت رسمی)", logo: "۱", sources: ["https://tv1.ir"] },
             { id: "tv2", name: "شبکه دو HD", logo: "۲", sources: TW("tv2") },
             { id: "tv3", name: "شبکه سه HD", logo: "۳", sources: TW("tv3") },
             { id: "tv4", name: "شبکه چهار", logo: "۴", sources: TW("tv4") },
