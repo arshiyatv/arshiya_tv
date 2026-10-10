@@ -1,0 +1,218 @@
+:root {
+  --bg: #050508;
+  --card: #12121a;
+  --card-h: #1a1a26;
+  --line: rgba(255,255,255,0.08);
+  --text: #f2f2f7;
+  --muted: #8e8e9a;
+  --red: #e50914;
+  --glow: 0 0 36px rgba(229,9,20,0.32);
+  --font: "Segoe UI", system-ui, -apple-system, Tahoma, sans-serif;
+  --sticky-z: 40;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  background:
+    radial-gradient(1000px 500px at 80% -10%, rgba(229,9,20,0.16), transparent 55%),
+    var(--bg);
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* بنر نصب */
+.install-banner {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(90deg, #1a0508, #2a0a10);
+  border-bottom: 1px solid rgba(229,9,20,0.35);
+  font-size: 0.8rem;
+}
+.install-banner[hidden] { display: none !important; }
+.install-text { flex: 1; }
+.install-text strong { display: block; }
+.install-text span { color: var(--muted); font-size: 0.72rem; }
+.install-btn {
+  border: 0; background: var(--red); color: #fff;
+  border-radius: 999px; padding: 8px 14px; font-weight: 700; cursor: pointer;
+}
+.install-x {
+  border: 0; background: transparent; color: var(--muted);
+  font-size: 1.25rem; cursor: pointer; padding: 4px 8px;
+}
+
+/* پوسته ثابت تیوی */
+.sticky-shell {
+  position: sticky;
+  top: 0;
+  z-index: var(--sticky-z);
+  background: rgba(5,5,8,0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo {
+  width: 40px; height: 40px; border-radius: 11px;
+  object-fit: cover; box-shadow: var(--glow);
+}
+.brand h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.4px; }
+.brand p { font-size: 0.65rem; color: var(--muted); letter-spacing: 1.5px; }
+.icon-pill {
+  border: 1px solid var(--line); background: var(--card); color: var(--text);
+  border-radius: 999px; padding: 7px 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+}
+
+.stage {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 16 / 9;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), var(--glow);
+  border: 1px solid var(--line);
+}
+.stage video, .stage iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  border: 0; background: #000; object-fit: contain;
+}
+.noise {
+  position: absolute; inset: 0; z-index: 2; opacity: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 140px;
+  animation: noise 0.35s steps(2) infinite;
+}
+.noise.on { opacity: 0.3; }
+@keyframes noise {
+  to { transform: translate(-4%, 4%); }
+}
+.screen-label {
+  position: absolute; inset: 0; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 16px; font-size: 0.9rem; color: #ccc;
+  background: rgba(0,0,0,0.55); line-height: 1.55;
+}
+/* واترمارک کمرنگ — گوشه راست پایین (در RTL = سمت راست بصری) */
+.wm {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  z-index: 6;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(255,255,255,0.22);
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  user-select: none;
+}
+.stage:fullscreen .wm,
+.stage:-webkit-full-screen .wm {
+  font-size: 14px;
+  right: 16px;
+  bottom: 14px;
+  color: rgba(255,255,255,0.2);
+}
+.led {
+  position: absolute; left: 10px; top: 10px; width: 8px; height: 8px;
+  border-radius: 50%; background: #333; z-index: 5;
+}
+.led.on { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+
+.toolbar { display: flex; gap: 8px; margin-top: 10px; }
+.tool-btn {
+  flex: 1; border: 1px solid var(--line); background: var(--card); color: var(--text);
+  border-radius: 12px; padding: 11px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+}
+.tool-btn.primary {
+  background: linear-gradient(135deg, var(--red), #a00610);
+  border-color: transparent; box-shadow: var(--glow);
+}
+.status-bar {
+  font-size: 0.72rem; color: var(--muted); margin-top: 8px; min-height: 1.1em;
+}
+.status-bar.live { color: #22c55e; }
+.status-bar.warn { color: #fbbf24; }
+.status-bar.err { color: #f87171; }
+.status-bar.info { color: #93c5fd; }
+.now-playing { font-size: 0.85rem; margin-top: 4px; }
+
+/* پنل اسکرول‌شونده */
+.scroll-panel {
+  flex: 1;
+  padding: 12px 14px 40px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabs {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 6px;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0; border: 1px solid var(--line); background: var(--card); color: var(--muted);
+  border-radius: 999px; padding: 8px 14px; font-size: 0.78rem; font-weight: 600; cursor: pointer;
+}
+.tab.subtle { padding: 6px 12px; font-size: 0.72rem; }
+.tab.active {
+  background: var(--red); border-color: var(--red); color: #fff; box-shadow: var(--glow);
+}
+
+.channel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (min-width: 520px) {
+  .channel-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.ch-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  text-align: right; padding: 12px; border-radius: 14px;
+  border: 1px solid var(--line); background: var(--card); color: var(--text);
+  cursor: pointer; min-height: 84px;
+}
+.ch-card:active { background: var(--card-h); }
+.ch-card.active {
+  border-color: var(--red);
+  box-shadow: inset 0 0 0 1px var(--red), var(--glow);
+}
+.ch-logo {
+  width: 34px; height: 34px; border-radius: 9px;
+  background: linear-gradient(145deg, #1e1e2a, #0a0a10);
+  border: 1px solid var(--line); display: grid; place-items: center;
+  font-size: 0.68rem; font-weight: 800; color: #ff2d3a;
+}
+.ch-name { font-size: 0.8rem; font-weight: 600; line-height: 1.35; }
+.ch-badge {
+  font-size: 0.62rem; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px;
+}
+.foot {
+  margin-top: 24px; text-align: center; font-size: 0.68rem;
+  color: var(--muted); letter-spacing: 1px;
+}

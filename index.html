@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#050508" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="ARSHIA TV" />
+  <meta name="description" content="ARSHIA TV — پخش زنده حرفه‌ای" />
+  <title>ARSHIA TV</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="assets/icon-192.png" />
+  <link rel="icon" type="image/png" href="assets/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://radio.sr-api.ir" crossorigin />
+</head>
+<body>
+  <div id="install-banner" class="install-banner" hidden>
+    <div class="install-text">
+      <strong>نصب ارشیا TV</strong>
+      <span>روی صفحه اصلی گوشی</span>
+    </div>
+    <button type="button" class="install-btn" onclick="installApp()">نصب</button>
+    <button type="button" class="install-x" onclick="dismissInstall()" aria-label="بستن">×</button>
+  </div>
+
+  <!-- ناحیه ثابت: هدر + تیوی + دکمه‌ها (اسکرول نمی‌شود) -->
+  <div class="sticky-shell">
+    <header class="top">
+      <div class="brand">
+        <img class="brand-logo" src="assets/icon-192.png" width="40" height="40" alt="" />
+        <div>
+          <h1>ARSHIA TV</h1>
+          <p>LIVE</p>
+        </div>
+      </div>
+      <button type="button" class="icon-pill" onclick="installApp()">نصب</button>
+    </header>
+
+    <div class="stage" id="stage">
+      <div class="led on" id="led"></div>
+      <div class="noise" id="noise"></div>
+      <div class="screen-label" id="screen-label">آماده</div>
+      <video id="player" playsinline webkit-playsinline controls style="display:none"></video>
+      <iframe id="site-frame" title="site" style="display:none" sandbox="allow-scripts allow-same-origin"></iframe>
+      <!-- واترمارک همیشه — تمام‌صفحه هم دیده می‌شود -->
+      <div class="wm" id="wm">ARSHIA TV</div>
+    </div>
+
+    <div class="toolbar">
+      <button type="button" class="tool-btn" onclick="tvPower()">خاموش / روشن</button>
+      <button type="button" class="tool-btn primary" onclick="tvFullscreen()">تمام‌صفحه</button>
+    </div>
+
+    <div class="status-bar" id="status-bar"></div>
+    <div class="now-playing" id="now-playing" hidden></div>
+  </div>
+
+  <!-- فقط این بخش اسکرول می‌شود -->
+  <div class="scroll-panel">
+    <div class="tabs" id="path-tabs"></div>
+    <div class="tabs" id="group-tabs"></div>
+    <div class="channel-grid" id="channel-grid"></div>
+    <p class="foot">ARSHIA TV · v4</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+  <script src="core/brain.js"></script>
+  <script src="core/channels-db.js"></script>
+  <script src="core/stream-engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
