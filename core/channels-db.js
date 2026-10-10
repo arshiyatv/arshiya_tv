@@ -26,7 +26,7 @@ function TW(slug) {
         {
           title: "سراسری",
           channels: [
-            { id: "tv1", name: "شبکه یک HD", logo: "۱", sources: TW("tv1") },
+            { id: "tv1_proxy", name: "شبکه یک HD (پروکسی)", logo: "۱", sources: ["https://workers.dev"] },
             { id: "tv2", name: "شبکه دو HD", logo: "۲", sources: TW("tv2") },
             { id: "tv3", name: "شبکه سه HD", logo: "۳", sources: TW("tv3") },
             { id: "tv4", name: "شبکه چهار", logo: "۴", sources: TW("tv4") },
