@@ -9,7 +9,7 @@
     brand: "ARSHIA TV",
     // بعد از ساخت Cloudflare Worker این خط را پر کن:
     // proxyBase: "https://YOUR-NAME.YOUR-SUBDOMAIN.workers.dev/?u=",
-    proxyBase: "",
+    proxyBase: "https://arshiya-proxy-5cdc.arshiyatv-hd-c4c.workers.dev/?u=",
     hls: {
       enableWorker: true,
       lowLatencyMode: true,
