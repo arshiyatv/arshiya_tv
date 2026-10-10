@@ -2,17 +2,21 @@
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
   <meta name="theme-color" content="#050508" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="ARSHIA TV" />
-  <meta name="description" content="ARSHIA TV PRO — پخش زنده حرفه‌ای" />
+  <meta name="description" content="ARSHIA TV PRO — پخش زنده حرفه‌ای شبکه‌های داخلی و ماهواره" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>ARSHIA TV PRO</title>
+
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="assets/icon-192.png" />
-  <link rel="icon" type="image/png" href="assets/icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
   <link rel="stylesheet" href="styles.css" />
+
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://radio.sr-api.ir" crossorigin />
   <link rel="dns-prefetch" href="https://ncdn.telewebion.ir" />
@@ -30,7 +34,7 @@
   <div class="app">
     <header class="top">
       <div class="brand">
-        <img class="brand-logo" src="assets/icon-192.png" width="44" height="44" alt="ARSHIA TV" />
+        <img class="brand-logo" src="icon-192.png" width="44" height="44" alt="ARSHIA TV" />
         <div>
           <h1>ARSHIA TV</h1>
           <p>LIVE · PRO</p>
@@ -44,7 +48,7 @@
       <div class="noise" id="noise"></div>
       <div class="screen-label" id="screen-label">آماده</div>
       <video id="player" playsinline webkit-playsinline controls style="display:none"></video>
-      <iframe id="site-frame" title="site" style="display:none" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+      <iframe id="site-frame" title="site" style="display:none" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
       <div class="wm">ARSHIA TV</div>
     </div>
 
@@ -60,10 +64,9 @@
     <div class="tabs" id="group-tabs"></div>
     <div class="channel-grid" id="channel-grid"></div>
 
-    <p class="foot">ARSHIA TV PRO · v3.1</p>
+    <p class="foot">ARSHIA TV PRO · v3.2.1</p>
   </div>
 
-  <!-- HLS اول، بدون defer تا قبل از app آماده باشد -->
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
   <script src="core/brain.js"></script>
   <script src="core/channels-db.js"></script>
