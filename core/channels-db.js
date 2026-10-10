@@ -6,10 +6,13 @@
   "use strict";
 
   function TW(slug) {
+    // کیفیت‌های مستقیم (پایدارتر از master) + چند CDN
     return [
+      "https://ncdn.telewebion.ir/" + slug + "/live/480p/index.m3u8",
+      "https://ncdn.telewebion.ir/" + slug + "/live/720p/index.m3u8",
+      "https://cdn.telewebion.ir/" + slug + "/live/480p/index.m3u8",
       "https://ncdn.telewebion.ir/" + slug + "/live/playlist.m3u8",
-      "https://cdn.telewebion.ir/" + slug + "/live/playlist.m3u8",
-      "https://cdnw.telewebion.com/" + slug + "/live/playlist.m3u8"
+      "https://cdn.telewebion.ir/" + slug + "/live/playlist.m3u8"
     ];
   }
 
