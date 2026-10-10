@@ -5,15 +5,18 @@
 (function (global) {
   "use strict";
 
-  function TW(slug) {
-    // کیفیت‌های مستقیم (پایدارتر از master) + چند CDN
+function TW(slug) {
     return [
       "https://ncdn.telewebion.ir/" + slug + "/live/480p/index.m3u8",
       "https://ncdn.telewebion.ir/" + slug + "/live/720p/index.m3u8",
-      "https://cdn.telewebion.ir/" + slug + "/live/480p/index.m3u8",
       "https://ncdn.telewebion.ir/" + slug + "/live/playlist.m3u8",
-      "https://cdn.telewebion.ir/" + slug + "/live/playlist.m3u8"
+      "https://cdn.telewebion.ir/" + slug + "/live/480p/index.m3u8",
+      "https://cdnw.telewebion.com/" + slug + "/live/playlist.m3u8"
     ];
+  }
+
+  function TWSite(slug) {
+    return "https://www.telewebion.com/live/" + slug;
   }
 
   var DB = {
@@ -28,11 +31,11 @@
             { id: "tv3", name: "شبکه سه HD", logo: "۳", sources: TW("tv3") },
             { id: "tv4", name: "شبکه چهار", logo: "۴", sources: TW("tv4") },
             { id: "tv5", name: "شبکه پنج (تهران)", logo: "۵", sources: TW("tehran") },
-            { id: "irinn", name: "شبکه خبر HD", logo: "خبر", sources: TW("irinn") },
+            { id: "irinn", name: "شبکه خبر HD", logo: "خبر", sources: TW("irinn").concat(["http://185.9.2.18/chid_926/index.m3u8"]) },
             { id: "varzesh", name: "ورزش HD", logo: "⚽", sources: TW("varzesh") },
             { id: "nasim", name: "نسیم HD", logo: "ن", sources: TW("nasim") },
             { id: "mostanad", name: "مستند HD", logo: "م", sources: TW("mostanad") },
-            { id: "ifilm", name: "آی‌فیلم HD", logo: "IF", sources: TW("ifilm") },
+            { id: "ifilm", name: "آی‌فیلم HD", logo: "IF", sources: TW("ifilm").concat(["https://live.presstv.ir/hls/ifilmfa.m3u8"]) },
             { id: "namayesh", name: "نمایش HD", logo: "نمایش", sources: TW("namayesh") },
             { id: "tamasha", name: "تماشا HD", logo: "ت", sources: TW("hdtest") },
             { id: "omid", name: "امید", logo: "امید", sources: TW("omid") },
