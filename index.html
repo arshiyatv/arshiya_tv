@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0e17">
+  <meta name="description" content="ارشیا تی‌وی — پخش زنده حرفه‌ای">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>ARSHIA TV</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7"></script>
+</head>
+<body>
+  <!-- واترمارک برند (قرمز/سفید) -->
+  <div class="brand-wm" id="brandWm"><span class="wm-w">ARSHIA</span> <span class="wm-r">TV</span></div>
+
+  <header class="top-bar">
+    <div class="tb-right">
+      <button class="tb-icon" id="btnMenu"><i class="fa-solid fa-bars"></i></button>
+      <button class="tb-icon" id="btnSearch"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </div>
+    <div class="tb-center">
+      <span class="live-pill">LIVE</span>
+      <span class="logo-w">TV</span>
+      <span class="logo-r">ARSHIA</span>
+    </div>
+    <div class="tb-left">
+      <button class="user-avatar" id="btnUser" title="حساب"><span id="userLetter">?</span></button>
+    </div>
+  </header>
+
+  <main class="page" id="page">
+    <!-- PLAYER -->
+    <section class="player-wrap">
+      <div class="player-box">
+        <video id="vid" controls playsinline webkit-playsinline></video>
+        <div class="player-cover" id="cover"><div id="coverTxt">شبکه را انتخاب کنید</div></div>
+        <div class="player-acts">
+          <button id="btnRec" title="ضبط"><i class="fa-solid fa-circle"></i></button>
+          <button id="btnFs" title="تمام‌صفحه"><i class="fa-solid fa-expand"></i></button>
+        </div>
+      </div>
+      <div class="player-meta">
+        <span class="live-dot"><i class="fa-solid fa-circle"></i> زنده</span>
+        <h1 id="chTitle">انتخاب شبکه</h1>
+        <button class="meta-btn" id="btnEpg">جدول پخش</button>
+      </div>
+      <div class="epg-box" id="epgBox" hidden>
+        <div class="epg-head">جدول پخش — <b id="epgName"></b></div>
+        <div id="epgBody"></div>
+      </div>
+    </section>
+
+    <!-- CHANNELS (جمع‌شونده) -->
+    <section class="block" id="blkChannels">
+      <button class="block-toggle active" data-block="channels">
+        <span><i class="fa-solid fa-tower-broadcast"></i> شبکه‌های زنده</span>
+        <i class="fa-solid fa-chevron-down chev"></i>
+      </button>
+      <div class="block-body open" id="bodyChannels">
+        <div class="tabs" id="tabs"></div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </section>
+
+    <!-- ARCHIVE (جمع‌شونده) -->
+    <section class="block" id="blkArchive">
+      <button class="block-toggle" data-block="archive">
+        <span><i class="fa-solid fa-film"></i> آرشیو و پربازدید</span>
+        <i class="fa-solid fa-chevron-down chev"></i>
+      </button>
+      <div class="block-body" id="bodyArchive">
+        <div class="arch-row" id="archRow"></div>
+      </div>
+    </section>
+
+    <!-- SUB (جمع‌شونده) -->
+    <section class="block" id="blkSub">
+      <button class="block-toggle" data-block="sub">
+        <span><i class="fa-solid fa-crown"></i> اشتراک</span>
+        <i class="fa-solid fa-chevron-down chev"></i>
+      </button>
+      <div class="block-body" id="bodySub">
+        <div class="sub-card" id="subCard">
+          <div class="sub-badge" id="subBadge">رایگان</div>
+          <h3>اشتراک ارشیا تی‌وی</h3>
+          <p>دسترسی کامل به همه شبکه‌ها. بسته‌های ویژه به‌زودی.</p>
+          <button class="btn-red" id="btnActivateSub">فعال‌سازی رایگان</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="safe-bottom"></div>
+  </main>
+
+  <nav class="bot-nav">
+    <button class="bn active" data-p="home"><i class="fa-solid fa-house"></i><span>خانه</span></button>
+    <button class="bn" data-p="live"><i class="fa-solid fa-tower-broadcast"></i><span>زنده</span></button>
+    <button class="bn" data-p="arch"><i class="fa-solid fa-box-archive"></i><span>آرشیو</span></button>
+    <button class="bn" data-p="search"><i class="fa-solid fa-magnifying-glass"></i><span>جستجو</span></button>
+    <button class="bn" data-p="menu"><i class="fa-solid fa-bars-staggered"></i><span>منو</span></button>
+  </nav>
+
+  <!-- FAB حمایت + اشتراک -->
+  <div class="fabs">
+    <button class="fab fab-sub" id="fabSub" title="اشتراک"><i class="fa-solid fa-crown"></i></button>
+    <button class="fab fab-donate" id="fabDonate" title="حمایت"><i class="fa-solid fa-hand-holding-heart"></i></button>
+  </div>
+
+  <!-- DRAWER -->
+  <div class="ov" id="ov"></div>
+  <aside class="drawer" id="drawer">
+    <div class="dr-head">
+      <h3>منو</h3>
+      <button id="btnCloseDr"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <ul class="dr-list">
+      <li data-a="account"><i class="fa-solid fa-user"></i> حساب کاربری</li>
+      <li data-a="donate"><i class="fa-solid fa-heart" style="color:#ef4444"></i> حمایت مالی</li>
+      <li data-a="sub"><i class="fa-solid fa-crown"></i> اشتراک</li>
+      <li data-a="install"><i class="fa-solid fa-download"></i> نصب روی گوشی</li>
+      <li data-a="share"><i class="fa-solid fa-share-nodes"></i> ارسال لینک</li>
+      <li data-a="archive"><i class="fa-solid fa-film"></i> آرشیو</li>
+      <li data-a="admin" id="adminMenuItem" hidden><i class="fa-solid fa-lock"></i> پنل مدیریت</li>
+      <li data-a="rules"><i class="fa-solid fa-shield-halved"></i> قوانین</li>
+    </ul>
+    <div class="dr-user" id="drUser"></div>
+  </aside>
+
+  <!-- MODALS -->
+  <div class="modal" id="mAuth">
+    <div class="mbox">
+      <h3 id="authHead">ورود / ثبت‌نام</h3>
+      <p class="mdesc" id="authDesc">نام کاربری انگلیسی، ایمیل و شماره موبایل الزامی است.</p>
+      <div id="authForm">
+        <input class="minp" id="aUser" placeholder="Username (English)" autocomplete="username" dir="ltr">
+        <input class="minp" id="aEmail" type="email" placeholder="Email" autocomplete="email" dir="ltr">
+        <input class="minp" id="aPhone" type="tel" placeholder="09xxxxxxxxx" dir="ltr">
+        <input class="minp" id="aPass" type="password" placeholder="Password" autocomplete="new-password" dir="ltr">
+        <input class="minp" id="aCode" placeholder="کد تأیید ایمیل (اختیاری در نسخه فعلی)" dir="ltr" style="display:none">
+        <button class="btn-red" id="btnAuthGo">ورود / ثبت‌نام</button>
+      </div>
+      <div id="authLogged" hidden>
+        <p class="mdesc">وارد شده‌اید.</p>
+        <button class="btn-dark" id="btnEditInfo">ویرایش اطلاعات</button>
+        <button class="btn-dark" id="btnLogout">خروج از حساب</button>
+        <button class="btn-dark danger" id="btnDelAcc">حذف حساب کاربری</button>
+      </div>
+      <button class="btn-dark" data-x="mAuth">بستن</button>
+    </div>
+  </div>
+
+  <div class="modal" id="mDonate">
+    <div class="mbox">
+      <div class="micon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+      <h3>حمایت از ارشیا تی‌وی</h3>
+      <p class="mdesc">شماره کارت‌های فعال:</p>
+      <div id="cardsList"></div>
+      <button class="btn-dark" data-x="mDonate">بستن</button>
+    </div>
+  </div>
+
+  <div class="modal" id="mSearch">
+    <div class="mbox tall">
+      <h3>جستجو</h3>
+      <input class="minp" id="sInp" placeholder="نام شبکه یا گروه...">
+      <div id="sRes" class="sres"></div>
+      <button class="btn-dark" data-x="mSearch">بستن</button>
+    </div>
+  </div>
+
+  <div class="modal" id="mInstall">
+    <div class="mbox">
+      <h3>نصب ارشیا تی‌وی</h3>
+      <p class="mdesc">از منوی مرورگر گزینه «Add to Home Screen» یا «نصب اپ» را بزنید. آیکون روی صفحه اصلی می‌آید.</p>
+      <button class="btn-red" id="btnInst">نصب</button>
+      <button class="btn-dark" data-x="mInstall">بستن</button>
+    </div>
+  </div>
+
+  <div class="modal" id="mRules">
+    <div class="mbox">
+      <h3>قوانین</h3>
+      <p class="mdesc">استفاده از ارشیا تی‌وی به معنای پذیرش قوانین است. محتوا جهت سرگرمی ارائه می‌شود.</p>
+      <button class="btn-dark" data-x="mRules">بستن</button>
+    </div>
+  </div>
+
+  <div class="modal" id="mAdmin">
+    <div class="mbox tall">
+      <h3>پنل مدیریت</h3>
+      <div id="admBody"></div>
+      <button class="btn-dark" data-x="mAdmin">بستن</button>
+    </div>
+  </div>
+
+  <script src="channels-db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
