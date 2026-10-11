@@ -1,76 +1,192 @@
+<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#050508" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="ARSHIA TV" />
-  <meta name="description" content="ARSHIA TV — پخش زنده حرفه‌ای" />
-  <title>ARSHIA TV</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="assets/icon-192.png" />
-  <link rel="icon" type="image/png" href="assets/icon-192.png" />
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="preconnect" href="https://radio.sr-api.ir" crossorigin />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ARSHIA TV | پخش زنده و رسانه هوشمند</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
-  <div id="install-banner" class="install-banner" hidden>
-    <div class="install-text">
-      <strong>نصب ارشیا TV</strong>
-      <span>روی صفحه اصلی گوشی</span>
-    </div>
-    <button type="button" class="install-btn" onclick="installApp()">نصب</button>
-    <button type="button" class="install-x" onclick="dismissInstall()" aria-label="بستن">×</button>
-  </div>
 
-  <!-- ناحیه ثابت: هدر + تیوی + دکمه‌ها (اسکرول نمی‌شود) -->
-  <div class="sticky-shell">
-    <header class="top">
-      <div class="brand">
-        <img class="brand-logo" src="assets/icon-192.png" width="40" height="40" alt="" />
-        <div>
-          <h1>ARSHIA TV</h1>
-          <p>LIVE</p>
+    <!-- هدر بالای صفحه -->
+    <header class="tele-top-header">
+        <div class="header-right">
+            <button class="icon-btn" onclick="openModal('authModal')"><i class="fa-regular fa-user"></i></button>
+            <span class="brand-tw">ARSHIA <span class="red-highlight">TV</span></span>
         </div>
-      </div>
-      <button type="button" class="icon-pill" onclick="installApp()">نصب</button>
+        <div class="header-left">
+            <button class="icon-btn" onclick="openModal('searchModal')"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <button class="icon-btn" onclick="toggleDrawer()"><i class="fa-solid fa-bars"></i></button>
+        </div>
     </header>
 
-    <div class="stage" id="stage">
-      <div class="led on" id="led"></div>
-      <div class="noise" id="noise"></div>
-      <div class="screen-label" id="screen-label">آماده</div>
-      <video id="player" playsinline webkit-playsinline controls style="display:none"></video>
-      <iframe id="site-frame" title="site" style="display:none" sandbox="allow-scripts allow-same-origin"></iframe>
-      <!-- واترمارک همیشه — تمام‌صفحه هم دیده می‌شود -->
-      <div class="wm" id="wm">ARSHIA TV</div>
+    <!-- محتوای اصلی اسکرول‌شونده موبایل -->
+    <main class="mobile-main-container">
+        
+        <!-- بخش پلیر ویدیو در بالا -->
+        <div class="player-container-box">
+            <div class="video-wrapper">
+                <video id="main-video-player" controls playsinline></video>
+                <div class="watermark-badge">ARSHIA TV</div>
+            </div>
+            <div class="video-title-bar">
+                <div class="live-status-pill"><i class="fa-solid fa-circle pulsing-dot"></i> زنده</div>
+                <h2 id="current-channel-name">شبکه سه سیما</h2>
+            </div>
+        </div>
+
+        <!-- نوار دایره‌ای افقی شبکه‌ها (دقیقاً مشابه تلوبیون) -->
+        <div class="channels-horizontal-scroll">
+            {% for channel in channels %}
+                <div class="channel-circle-item" onclick="selectChannel('{{ channel.name }}', {{ channel.streams | tojson | safe }})">
+                    <div class="circle-avatar" style="border-color: {{ channel.color }};">{{ channel.logo_text }}</div>
+                    <span class="circle-name">{{ channel.name }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- بنر تبلیغاتی یا بخش ویژه حامیان -->
+        <div class="promo-banner-card" onclick="openModal('donateModal')">
+            <div class="promo-content">
+                <i class="fa-solid fa-hand-holding-heart promo-icon"></i>
+                <div>
+                    <h4>حامی رسمی ارشیا تی‌وی باشید</h4>
+                    <p>پشتیبانی از سرورهای اختصاصی و تداوم پخش پایدار</p>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-left"></i>
+        </div>
+
+        <!-- بخش آرشیو محتوایی و برنامه‌ها -->
+        <div class="archive-section-box">
+            <div class="section-title-row">
+                <h3>آرشیو و پربازدیدترین‌های هفته</h3>
+                <span class="view-all-link" onclick="openModal('archiveModal')">مشاهده همه</span>
+            </div>
+            <div class="archive-grid">
+                <div class="archive-card">
+                    <div class="thumb-box"><i class="fa-solid fa-play"></i><span>۰۸:۵۸</span></div>
+                    <div class="archive-info">
+                        <h4>اخبار بامدادی و سراسری</h4>
+                        <p>۱۱ هزار بازدید • ۲ روز پیش</p>
+                    </div>
+                </div>
+                <div class="archive-card">
+                    <div class="thumb-box"><i class="fa-solid fa-play"></i><span>۰۴:۲۸</span></div>
+                    <div class="archive-info">
+                        <h4>پربازدیدترین گزارش‌های ورزشی</h4>
+                        <p>۷.۴ هزار بازدید • ۳ روز پیش</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- نوار ناوبری پایین صفحه (فیکس موبایل دقیقاً مانند تصویر) -->
+    <nav class="mobile-bottom-nav">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i><span>خانه</span></a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-tower-broadcast"></i><span>پخش زنده</span></a>
+        <a href="#" class="nav-item" onclick="openModal('archiveModal')"><i class="fa-solid fa-box-archive"></i><span>آرشیو</span></a>
+        <a href="#" class="nav-item" onclick="openModal('searchModal')"><i class="fa-solid fa-magnifying-glass"></i><span>جستجو</span></a>
+        <a href="#" class="nav-item" onclick="toggleDrawer()"><i class="fa-solid fa-bars-staggered"></i><span>لیست من</span></a>
+    </nav>
+
+    <!-- منوی کشویی Drawer -->
+    <div class="app-drawer" id="appDrawer">
+        <div class="drawer-header">
+            <h3>منوی کاربری</h3>
+            <button onclick="toggleDrawer()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <ul class="drawer-links">
+            <li><a href="#" onclick="openModal('authModal')"><i class="fa-solid fa-user-shield"></i> ورود / ثبت‌نام</a></li>
+            <li><a href="#" onclick="openModal('donateModal')"><i class="fa-solid fa-heart" style="color:#ef4444;"></i> حمایت مالی از پروژه</a></li>
+            <li><a href="#" onclick="openModal('installModal')"><i class="fa-solid fa-download"></i> نصب اپلیکیشن</a></li>
+            <li><a href="#" onclick="openModal('archiveModal')"><i class="fa-solid fa-film"></i> آرشیو محتوا</a></li>
+            <li><a href="#"><i class="fa-solid fa-shield-halved"></i> قوانین و مقررات</a></li>
+        </ul>
+    </div>
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+
+    <!-- مودال حمایت مالی با متن بسیار تأثیرگذار -->
+    <div class="custom-modal" id="donateModal">
+        <div class="modal-content">
+            <div class="modal-icon-top"><i class="fa-solid fa-hand-holding-heart"></i></div>
+            <h3>حامی زیرساخت ارشیا تی‌وی</h3>
+            <p class="modal-desc">
+                راه‌اندازی، نگهداری و توسعه بستر استریم ابری و پروکسی‌های اختصاصی شبکه‌های تلویزیونی در سطح کلان، نیازمند تأمین هزینه‌های سنگین سرور، پهنای باند و منابع سخت‌افزاری است. با حمایت مالی داوطلبانه شما، این جریان آزاد اطلاعات و سرگرمی بدون وقفه به کار خود ادامه خواهد داد.
+            </p>
+            <div class="donate-grid">
+                <button class="donate-btn">۵۰,۰۰۰ تومان</button>
+                <button class="donate-btn active-d">۲۰۰,۰۰۰ تومان (حامی ویژه)</button>
+                <button class="donate-btn">۵۰۰,۰۰۰ تومان</button>
+            </div>
+            <button class="main-action-btn" onclick="alert('از حمایت سخاوتمندانه شما کمال تشکر را داریم.')">پرداخت امن و حمایت</button>
+            <button class="close-btn" onclick="closeModal('donateModal')">بازگشت</button>
+        </div>
     </div>
 
-    <div class="toolbar">
-      <button type="button" class="tool-btn" onclick="tvPower()">خاموش / روشن</button>
-      <button type="button" class="tool-btn primary" onclick="tvFullscreen()">تمام‌صفحه</button>
+    <!-- مودال ورود -->
+    <div class="custom-modal" id="authModal">
+        <div class="modal-content">
+            <h3>ورود یا ثبت‌نام</h3>
+            <p>جهت دسترسی به کیفیت بالا، شماره موبایل خود را وارد کنید.</p>
+            <input type="text" placeholder="۰۹۱۲۳۴۵۶۷۸۹" class="modal-input">
+            <button class="main-action-btn" onclick="alert('کد تایید ارسال شد')">ادامه</button>
+            <button class="close-btn" onclick="closeModal('authModal')">انصراف</button>
+        </div>
     </div>
 
-    <div class="status-bar" id="status-bar"></div>
-    <div class="now-playing" id="now-playing" hidden></div>
-  </div>
+    <!-- مودال جستجو و آرشیو -->
+    <div class="custom-modal" id="searchModal">
+        <div class="modal-content">
+            <h3>جستجوی شبکه یا برنامه</h3>
+            <input type="text" placeholder="نام شبکه، فیلم یا مسابقه..." class="modal-input">
+            <button class="main-action-btn">جستجو کن</button>
+            <button class="close-btn" onclick="closeModal('searchModal')">بستن</button>
+        </div>
+    </div>
 
-  <!-- فقط این بخش اسکرول می‌شود -->
-  <div class="scroll-panel">
-    <div class="tabs" id="path-tabs"></div>
-    <div class="tabs" id="group-tabs"></div>
-    <div class="channel-grid" id="channel-grid"></div>
-    <p class="foot">ARSHIA TV · v4</p>
-  </div>
+    <script>
+        let currentHls = null;
 
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-  <script src="core/brain.js"></script>
-  <script src="core/channels-db.js"></script>
-  <script src="core/stream-engine.js"></script>
-  <script src="app.js"></script>
+        function toggleDrawer() {
+            document.getElementById('appDrawer').classList.toggle('open');
+            document.getElementById('drawerOverlay').classList.toggle('open');
+        }
+
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; if(document.getElementById('appDrawer').classList.contains('open')) toggleDrawer(); }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function selectChannel(name, streams) {
+            document.getElementById('current-channel-name').innerText = name;
+            playStreamSequence(streams, 0, name);
+        }
+
+        function playStreamSequence(streams, index, name) {
+            const videoPlayer = document.getElementById('main-video-player');
+            if (!streams || index >= streams.length) return;
+            const url = streams[index];
+
+            if (currentHls) { currentHls.destroy(); currentHls = null; }
+
+            if (Hls.isSupported() && (url.includes('.m3u8') || url.includes('proxy-stream'))) {
+                currentHls = new Hls();
+                currentHls.loadSource(url);
+                currentHls.attachMedia(videoPlayer);
+                currentHls.on(Hls.Events.MANIFEST_PARSED, () => { videoPlayer.play(); });
+                currentHls.on(Hls.Events.ERROR, (event, data) => {
+                    if (data.fatal) playStreamSequence(streams, index + 1, name);
+                });
+            } else {
+                videoPlayer.src = url;
+                videoPlayer.load();
+                videoPlayer.play().catch(() => playStreamSequence(streams, index + 1, name));
+            }
+        }
+    </script>
 </body>
-</html>
+  </html>
