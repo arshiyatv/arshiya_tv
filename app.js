@@ -1,308 +1,206 @@
 /**
- * ARSHIA TV FINAL — UI v4
- * تیوی ثابت بالا؛ فقط لیست شبکه‌ها اسکرول می‌شود
+ * ARSHIA TV — Player & UI Logic (Static)
+ * ظاهر دقیقاً مطابق نسخه فیلم — بدون حذف هیچ شبکه‌ای
  */
 (function () {
   "use strict";
 
-  var brain = window.ArshiaBrain;
-  var DB = window.ArshiaChannels || {};
-  var engine = null;
-  var deferredPrompt = null;
+  var currentHls = null;
+  var currentGroup = "همه";
+  var COLORS = ["#ef4444", "#3b82f6", "#22c55e", "#a855f7", "#f59e0b", "#06b6d4", "#ec4899", "#84cc16"];
 
-  var state = {
-    path: "domestic",
-    group: 0,
-    channel: null,
-    power: true
-  };
-
-  function $(id) { return document.getElementById(id); }
-  function esc(s) {
-    return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
-
-  function groups() {
-    return (DB[state.path] && DB[state.path].groups) || [];
-  }
-  function channelList() {
-    var g = groups()[state.group];
-    return (g && g.channels) || [];
-  }
-
-  function setStatus(text, kind) {
-    var el = $("status-bar");
-    if (!el) return;
-    el.textContent = text || "";
-    el.className = "status-bar" + (kind ? " " + kind : "");
-  }
-
-  function showSnow(on) {
-    var n = $("noise");
-    if (n) n.classList.toggle("on", !!on);
-  }
-
-  function setLabel(html, show) {
-    var el = $("screen-label");
-    if (!el) return;
-    el.style.display = show ? "flex" : "none";
-    if (html != null) el.innerHTML = html;
-  }
-
-  function hideSiteFrame() {
-    var frame = $("site-frame");
-    if (frame) {
-      frame.style.display = "none";
-      try { frame.removeAttribute("src"); } catch (e) {}
-    }
-  }
-
-  function showPlayer(show) {
-    var p = $("player");
-    if (p) p.style.display = show ? "block" : "none";
-  }
-
-  function renderPaths() {
-    var bar = $("path-tabs");
-    if (!bar) return;
-    bar.innerHTML = "";
-    ["domestic", "satellite"].forEach(function (key) {
-      if (!DB[key]) return;
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "tab" + (state.path === key ? " active" : "");
-      b.textContent = DB[key].title;
-      b.onclick = function () {
-        state.path = key;
-        state.group = 0;
-        renderPaths();
-        renderGroups();
-        renderGrid();
-      };
-      bar.appendChild(b);
-    });
-  }
-
-  function renderGroups() {
-    var bar = $("group-tabs");
-    if (!bar) return;
-    bar.innerHTML = "";
-    groups().forEach(function (g, i) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "tab subtle" + (state.group === i ? " active" : "");
-      b.textContent = g.title;
-      b.onclick = function () {
-        state.group = i;
-        renderGroups();
-        renderGrid();
-      };
-      bar.appendChild(b);
-    });
-  }
-
-  function renderGrid() {
-    var grid = $("channel-grid");
-    if (!grid) return;
-    grid.innerHTML = "";
-    channelList().forEach(function (ch) {
-      var has = (ch.sources && ch.sources.length) || ch.play;
-      var card = document.createElement("button");
-      card.type = "button";
-      card.className = "ch-card" + (state.channel && state.channel.id === ch.id ? " active" : "");
-      card.innerHTML =
-        '<span class="ch-logo">' + esc(ch.logo || "▶") + "</span>" +
-        '<span class="ch-name">' + esc(ch.name) + "</span>" +
-        (has ? "" : '<span class="ch-badge">به‌زودی</span>');
-      card.onclick = function () { tune(ch); };
-      grid.appendChild(card);
-    });
-  }
-
-  function ensureEngine() {
-    if (engine) return engine;
-    if (typeof window.ArshiaStreamEngine !== "function") {
-      setStatus("موتور پخش لود نشده", "err");
-      return null;
-    }
-    var v = $("player");
-    engine = new window.ArshiaStreamEngine(v);
-    engine.onStatus = function (type, detail) {
-      if (type === "connecting") {
-        showSnow(true);
-        setLabel("در حال اتصال…", true);
-        setStatus("اتصال به منبع " + ((detail.index || 0) + 1) + "…", "info");
-      } else if (type === "playing") {
-        showSnow(false);
-        setLabel("", false);
-        showPlayer(true);
-        setStatus("● پخش زنده — " + (state.channel ? state.channel.name : ""), "live");
-      } else if (type === "failover") {
-        setStatus("تعویض سرور خودکار…", "warn");
-      } else if (type === "need_gesture") {
-        setLabel("یک‌بار روی تصویر بزنید", true);
-      } else if (type === "error") {
-        // اگر HLS شکست → صفحه زنده تلوبیون را داخل قاب باز کن
-        var ch = state.channel;
-        var slugMap = {
-          tv1: "tv1", tv2: "tv2", tv3: "tv3", tv4: "tv4", tv5: "tehran",
-          irinn: "irinn", varzesh: "varzesh", nasim: "nasim", mostanad: "mostanad",
-          ifilm: "ifilm", namayesh: "namayesh", tamasha: "hdtest", omid: "omid",
-          pooya: "pooya", faratar: "ofogh", quran: "quran", amouzesh: "amouzesh",
-          salamat: "salamat"
-        };
-        var slug = ch && (slugMap[ch.id] || (ch.id && ch.id.indexOf("prov-") === 0 ? null : ch.id));
-        if (slug) {
-          showSnow(false);
-          showPlayer(false);
-          var frame = $("site-frame");
-          if (frame) {
-            frame.style.display = "block";
-            frame.src = "https://www.telewebion.com/live/" + slug;
-          }
-          setLabel("", false);
-          setStatus("پخش از سایت رسمی…", "warn");
-          return;
-        }
-        showSnow(true);
-        showPlayer(false);
-        setLabel((detail && detail.message) || "سیگنال در دسترس نیست", true);
-        setStatus("قطع", "err");
-      }
+  function shortLogo(ch) {
+    if (ch.logo && ch.logo.trim()) return ch.logo;
+    var map = {
+      iranintl: "INTL", azadi: "آزادی", cheshmeh: "عقاب", dej: "دژ",
+      gordafarid: "گرد", bbcpersian: "BBC", radiofarda: "فردا", voapersian: "VOA",
+      simayeazadi: "آزادی", shorai: "شورا", mihan: "میهن", setareh: "ستاره",
+      iranwire: "Wire", mellig: "ملی", kanaljadid: "جدید", zed: "ZED",
+      iranefarda: "فردا", irannr: "NR", pleon: "لئون", pulse: "پالس",
+      didgah: "دید", parstv: "پارس",
+      pmc: "PMC", pmcroyale: "PR", rjtv: "RJ", avang: "آونگ",
+      navahang: "نوا", sunmusic: "سان", t2tv: "T2",
+      persiana_music: "PM", persiana_folk: "PF", persiana_nostalgia: "PN",
+      persiana_rap: "PR", persiana_setmix: "SM", afn: "AFN",
+      ifilmfa: "IF", ifilm2: "IF2", metafilm: "متا", fx: "FX",
+      toonix: "تون", box247: "247", avafamily: "آوا", maahtv: "ماه",
+      tapesh: "تپش", tintv: "TIN", arko: "آرکو", royal: "رویال",
+      oxir: "اکسیر", novin: "نوین", ravi: "راوی", yourtime: "YT",
+      mtc: "MTC", nettv: "نت", itn: "ITN", omideiran: "امید",
+      asil: "اصیل", assirat: "سیرات", alwilayah: "ولایه",
+      persiana_fight: "رزمی"
     };
-    return engine;
+    if (map[ch.id]) return map[ch.id];
+    return (ch.name || "?").substring(0, 3);
   }
 
-  function tune(ch) {
-    if (!ch) return;
-    if (!state.power) {
-      state.power = true;
-      var led = $("led");
-      if (led) led.classList.add("on");
-    }
-    state.channel = ch;
-    renderGrid();
-
-    var np = $("now-playing");
-    if (np) {
-      np.hidden = false;
-      np.innerHTML = "<strong>" + esc(ch.name) + "</strong>";
-    }
-
-    hideSiteFrame();
-    var srcs = brain && brain.sourcesOf ? brain.sourcesOf(ch) : (ch.sources || []);
-
-    if (srcs.length) {
-      showPlayer(true);
-      var eng = ensureEngine();
-      if (eng) eng.play(srcs);
-    } else {
-      if (engine) engine.destroy();
-      showPlayer(false);
-      showSnow(false);
-      var msg = ch.info
-        ? esc(ch.info)
-        : "لینک پخش مستقیم ثبت نشده — پس از مجوز رسمی اضافه می‌شود";
-      setLabel(msg, true);
-      setStatus("بدون استریم", "warn");
-    }
+  function getGroups() {
+    var set = {};
+    (window.CHANNELS || []).forEach(function (c) {
+      if (c.group) set[c.group] = true;
+    });
+    return ["همه"].concat(Object.keys(set));
   }
 
-  window.tvPower = function () {
-    state.power = !state.power;
-    var led = $("led");
-    if (led) led.classList.toggle("on", state.power);
-    if (!state.power) {
-      if (engine) engine.destroy();
-      hideSiteFrame();
-      showPlayer(false);
-      showSnow(true);
-      setLabel("خاموش", true);
-      setStatus("خاموش", "");
-    } else {
-      showSnow(true);
-      setLabel("آماده", true);
-      setStatus("آماده", "info");
-      if (state.channel) tune(state.channel);
-    }
-  };
-
-  window.tvFullscreen = function () {
-    var box = $("stage");
-    if (!box) return;
-    var req = box.requestFullscreen || box.webkitRequestFullscreen;
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
-      var exit = document.exitFullscreen || document.webkitExitFullscreen;
-      if (exit) exit.call(document);
-    } else if (req) {
-      req.call(box);
-    }
-  };
-
-  window.installApp = function () {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function () {
-        deferredPrompt = null;
-        var b = $("install-banner");
-        if (b) b.hidden = true;
+  function renderGroupFilter() {
+    var bar = document.getElementById("groupFilterBar");
+    if (!bar) return;
+    var groups = getGroups();
+    bar.innerHTML = groups.map(function (g) {
+      var active = g === currentGroup ? " active-group" : "";
+      return '<button class="group-chip' + active + '" data-group="' + g + '">' + g + "</button>";
+    }).join("");
+    bar.querySelectorAll(".group-chip").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        currentGroup = btn.getAttribute("data-group");
+        renderGroupFilter();
+        renderChannels();
       });
+    });
+  }
+
+  function renderChannels() {
+    var box = document.getElementById("channelsScroll");
+    if (!box) return;
+    var list = (window.CHANNELS || []).filter(function (c) {
+      return currentGroup === "همه" || c.group === currentGroup;
+    });
+    box.innerHTML = list.map(function (ch, i) {
+      var color = COLORS[i % COLORS.length];
+      var logo = shortLogo(ch);
+      return (
+        '<div class="channel-circle-item" data-id="' + ch.id + '">' +
+          '<div class="circle-avatar" style="border-color:' + color + ';">' + logo + "</div>" +
+          '<span class="circle-name">' + ch.name + "</span>" +
+        "</div>"
+      );
+    }).join("");
+
+    box.querySelectorAll(".channel-circle-item").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var id = el.getAttribute("data-id");
+        var ch = (window.CHANNELS || []).find(function (c) { return c.id === id; });
+        if (ch) selectChannel(ch);
+      });
+    });
+  }
+
+  function setStatus(msg) {
+    var el = document.getElementById("player-status");
+    if (!el) return;
+    if (!msg) {
+      el.style.display = "none";
+      el.textContent = "";
+    } else {
+      el.style.display = "flex";
+      el.textContent = msg;
+    }
+  }
+
+  function selectChannel(ch) {
+    document.getElementById("current-channel-name").textContent = ch.name;
+    var streams = Array.isArray(ch.streams) ? ch.streams.filter(Boolean) : [];
+    if (!streams.length) {
+      setStatus("لینک استریم برای این شبکه تعریف نشده");
       return;
     }
-    setStatus("کروم: منو ⋮ ← افزودن به صفحه اصلی / Install app", "info");
-    var banner = $("install-banner");
-    if (banner) banner.hidden = false;
-  };
+    playStreamSequence(streams, 0, ch.name);
+  }
 
-  window.dismissInstall = function () {
-    var banner = $("install-banner");
-    if (banner) banner.hidden = true;
-  };
+  function playStreamSequence(streams, index, name) {
+    var video = document.getElementById("main-video-player");
+    if (!streams || index >= streams.length) {
+      setStatus("هیچ منبعی پاسخ نداد");
+      return;
+    }
+    var url = streams[index];
+    setStatus("در حال اتصال به منبع " + (index + 1) + "...");
 
-  window.addEventListener("beforeinstallprompt", function (e) {
-    e.preventDefault();
-    deferredPrompt = e;
-    var banner = $("install-banner");
-    if (banner) banner.hidden = false;
-  });
+    if (currentHls) {
+      try { currentHls.destroy(); } catch (e) {}
+      currentHls = null;
+    }
+    video.removeAttribute("src");
+    video.load();
 
-  window.addEventListener("appinstalled", function () {
-    deferredPrompt = null;
-    var banner = $("install-banner");
-    if (banner) banner.hidden = true;
-    setStatus("نصب شد ✓", "live");
-  });
-
-  function boot() {
-    if (brain && brain.preconnect) brain.preconnect();
-    renderPaths();
-    renderGroups();
-    renderGrid();
-    showSnow(true);
-    setLabel("شبکه را انتخاب کنید", true);
-    setStatus("ARSHIA TV " + (brain ? brain.version : ""), "info");
-
-    var q = new URLSearchParams(location.search || "");
-    if (q.get("ch")) {
-      var want = q.get("ch");
-      var all = [];
-      Object.keys(DB).forEach(function (k) {
-        (DB[k].groups || []).forEach(function (g) {
-          (g.channels || []).forEach(function (c) { all.push(c); });
+    if (window.Hls && Hls.isSupported() && (/\.m3u8/i.test(url) || /playlist/i.test(url) || /hls/i.test(url))) {
+      currentHls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        maxBufferLength: 20,
+        maxMaxBufferLength: 40,
+        manifestLoadingTimeOut: 10000,
+        fragLoadingTimeOut: 12000
+      });
+      currentHls.loadSource(url);
+      currentHls.attachMedia(video);
+      currentHls.on(Hls.Events.MANIFEST_PARSED, function () {
+        setStatus("");
+        video.play().catch(function () {
+          setStatus("یکبار روی تصویر بزنید");
         });
       });
-      var found = all.find(function (c) { return c.id === want; });
-      if (found) setTimeout(function () { tune(found); }, 400);
-    }
-
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js").catch(function () {});
+      currentHls.on(Hls.Events.ERROR, function (evt, data) {
+        if (data.fatal) {
+          try { currentHls.destroy(); } catch (e) {}
+          currentHls = null;
+          playStreamSequence(streams, index + 1, name);
+        }
+      });
+    } else {
+      video.src = url;
+      video.load();
+      video.play().then(function () {
+        setStatus("");
+      }).catch(function () {
+        playStreamSequence(streams, index + 1, name);
+      });
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
+  // UI helpers
+  window.toggleDrawer = function () {
+    document.getElementById("appDrawer").classList.toggle("open");
+    document.getElementById("drawerOverlay").classList.toggle("open");
+  };
+  window.openModal = function (id) {
+    var m = document.getElementById(id);
+    if (m) m.style.display = "flex";
+    if (document.getElementById("appDrawer").classList.contains("open")) toggleDrawer();
+  };
+  window.closeModal = function (id) {
+    var m = document.getElementById(id);
+    if (m) m.style.display = "none";
+  };
+
+  window.filterChannels = function (q) {
+    q = (q || "").trim().toLowerCase();
+    var box = document.getElementById("searchResults");
+    if (!box) return;
+    if (!q) { box.innerHTML = ""; return; }
+    var hits = (window.CHANNELS || []).filter(function (c) {
+      return (c.name || "").toLowerCase().indexOf(q) >= 0 || (c.group || "").toLowerCase().indexOf(q) >= 0;
+    });
+    box.innerHTML = hits.slice(0, 15).map(function (c) {
+      return '<div style="padding:8px;border-bottom:1px solid #1e293b;cursor:pointer;" data-sid="' + c.id + '">' +
+        c.name + ' <span style="color:#64748b;font-size:11px;">(' + c.group + ")</span></div>";
+    }).join("") || '<div style="padding:8px;color:#64748b;">نتیجه‌ای یافت نشد</div>';
+    box.querySelectorAll("[data-sid]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        var ch = (window.CHANNELS || []).find(function (c) { return c.id === el.getAttribute("data-sid"); });
+        if (ch) { closeModal("searchModal"); selectChannel(ch); }
+      });
+    });
+  };
+
+  // Init
+  document.addEventListener("DOMContentLoaded", function () {
+    renderGroupFilter();
+    renderChannels();
+    // اگر شبکه اول وجود داشت، آماده باش
+    var first = (window.CHANNELS || [])[0];
+    if (first) {
+      document.getElementById("current-channel-name").textContent = "انتخاب شبکه";
+    }
+  });
 })();
